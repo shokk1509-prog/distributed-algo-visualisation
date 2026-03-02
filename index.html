@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributed Algorithm Visualisation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050508;
+      --surface: #0d0d14;
+      --border: #1a1a2e;
+      --royal: #4169e1;
+      --deep: #ff1493;
+      --accent3: #ffe600;
+      --text: #e8e8f0;
+      --muted: #555570;
+      --font-mono: 'Space Mono', monospace;
+      --font-display: 'Syne', sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:var(--font-mono); }
+
+    #app {
+      display: grid;
+      grid-template-rows: 48px 1fr;
+      grid-template-columns: 220px 1fr 260px;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* TOPBAR */
+    #topbar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--text);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    .free-tag {
+      font-size: 9px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      letter-spacing: 0.1em;
+      margin-left: 6px;
+    }
+
+    /* LEFT SIDEBAR */
+    #dim-nav {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .nav-label {
+      padding: 14px 16px 8px;
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .dim-btn {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+      text-align: left;
+      width: 100%;
+    }
+    .dim-btn .dim-num {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+    .dim-btn .dim-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .dim-btn.active { border-left-color: var(--royal); background: rgba(65,105,225,0.05); color: var(--text); }
+    .dim-btn.active .dim-num { color: var(--royal); }
+    .dim-btn:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+    .dim-btn.locked { opacity: 0.3; cursor: not-allowed; }
+
+    .nav-separator { height: 1px; background: var(--border); margin: 4px 12px; }
+
+    /* 言語セクション */
+    .lang-section {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding: 12px 0 0;
+    }
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 7px 16px;
+      border: none;
+      border-left: 2px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+      letter-spacing: 0.04em;
+    }
+    .lang-btn:hover  { background: rgba(65,105,225,0.04); color: var(--royal); border-left-color: var(--royal); }
+    .lang-btn.active { background: rgba(65,105,225,0.08); color: var(--royal); border-left-color: var(--royal); }
+    .lang-btn .flag  { font-size: 13px; }
+
+    .hawking-note {
+      padding: 10px 16px 14px;
+      font-size: 7.5px;
+      color: var(--muted);
+      line-height: 1.8;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+
+    /* MAIN */
+    #main { position: relative; overflow: hidden; background: var(--bg); }
+    .dim-panel { position: absolute; inset: 0; display: none; }
+    .dim-panel.active { display: block; }
+    canvas { display: block; }
+    #dim2-svg { width: 100%; height: 100%; }
+    .hud { position: absolute; top: 12px; left: 12px; pointer-events: none; font-size: 10px; color: rgba(65,105,225,0.9); letter-spacing: 0.08em; line-height: 1.8; }
+    .hud-r { right: 12px; left: auto; text-align: right; }
+
+    #statusbar {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 24px;
+      background: rgba(5,5,8,0.9); border-top: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 12px; gap: 20px;
+      font-size: 10px; color: var(--muted); pointer-events: none; z-index: 10;
+    }
+    .status-dot { color: var(--royal); }
+    .status-dot::before { content: '●  '; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* RIGHT PANEL */
+    #info-panel {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .info-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .info-title {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--royal);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .kv-row { display: flex; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
+    .kv-key  { color: var(--muted); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .kv-val  { color: var(--text); font-size: 11px; text-align: right; }
+    .kv-val.hi   { color: var(--royal); }
+    .kv-val.warn { color: var(--accent3); }
+    .formula-box {
+      background: rgba(65,105,225,0.05);
+      border: 1px solid rgba(65,105,225,0.2);
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--royal);
+      margin-bottom: 8px;
+    }
+    .func-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    .func-table th { color: var(--muted); text-align: left; padding: 3px 4px; border-bottom: 1px solid var(--border); }
+    .func-table td { color: var(--text); padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .func-table td.num { color: var(--accent3); }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo">
+      DISTRIBUTED ALGORITHM VISUALISATION
+      <span class="free-tag">FREE</span>
+    </div>
+  </div>
+
+  <!-- LEFT SIDEBAR -->
+  <nav id="dim-nav">
+    <div class="nav-label">Dimensions</div>
+    <button class="dim-btn active" data-dim="1">
+      <span class="dim-num">I</span>
+      <span class="dim-label" data-i18n="dim_1_label">Orbital View</span>
+    </button>
+    <button class="dim-btn" data-dim="2">
+      <span class="dim-num">II</span>
+      <span class="dim-label" data-i18n="dim_2_label">Trade-off</span>
+    </button>
+    <button class="dim-btn locked" data-dim="3">
+      <span class="dim-num">III</span>
+      <span class="dim-label">Vector Field</span>
+    </button>
+    <button class="dim-btn locked" data-dim="4">
+      <span class="dim-num">IV</span>
+      <span class="dim-label">State Duality</span>
+    </button>
+    <button class="dim-btn locked" data-dim="5">
+      <span class="dim-num">V</span>
+      <span class="dim-label">Quantum Orbit</span>
+    </button>
+
+    <!-- 言語 -->
+    <div class="lang-section">
+      <div class="nav-label">Language / Sprache</div>
+      <button class="lang-btn active" data-lang="en-GB"><span class="flag">🇬🇧</span> British English</button>
+      <button class="lang-btn" data-lang="de-CH"><span class="flag">🇨🇭</span> Schwiizerdütsch</button>
+      <button class="lang-btn" data-lang="fr-CH"><span class="flag">🇨🇭</span> Français (CH)</button>
+      <button class="lang-btn" data-lang="fr-QC"><span class="flag">🇨🇦</span> Français (QC)</button>
+      <button class="lang-btn" data-lang="it-CH"><span class="flag">🇨🇭</span> Italiano (CH)</button>
+      <button class="lang-btn" data-lang="rm-CH"><span class="flag">🇨🇭</span> Rumantsch</button>
+      <button class="lang-btn" data-lang="nl-NL"><span class="flag">🇳🇱</span> Nederlands</button>
+      <button class="lang-btn" data-lang="is-IS"><span class="flag">🇮🇸</span> Íslenska</button>
+      <div class="hawking-note">
+        The inclusion of the United Kingdom reflects a gesture of gratitude to Stephen Hawking, whose intellectual work shaped the structural origin of this project.
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div class="dim-panel active" id="panel-1">
+      <canvas id="canvas-dim1"></canvas>
+      <div class="hud" id="hud-dim1"></div>
+      <div class="hud hud-r" id="hud-dim1-r"></div>
+    </div>
+    <div class="dim-panel" id="panel-2">
+      <svg id="dim2-svg"></svg>
+      <div class="hud" id="hud-dim2"></div>
+    </div>
+    <div id="statusbar">
+      <span class="status-dot">LOCAL</span>
+      <span id="status-dim">Dimension I — Orbital View</span>
+      <span id="status-fps">FPS: —</span>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="info-panel">
+    <div class="info-section">
+      <div class="info-title">Proof of Work</div>
+      <div class="formula-box">β·√r·e<sup>iθ</sup></div>
+      <div class="kv-row">
+        <span class="kv-key" data-i18n="info_nodes">Nodes</span>
+        <span class="kv-val hi">8</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">β (beta)</span>
+        <span class="kv-val hi">0.420</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key" data-i18n="info_latency">Latency</span>
+        <span class="kv-val warn">600 ms</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key" data-i18n="info_fault">Fault tol.</span>
+        <span class="kv-val">&lt; 50%</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key" data-i18n="info_throughput">Throughput</span>
+        <span class="kv-val">~7 tx/s</span>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-title">Function Table</div>
+      <table class="func-table">
+        <thead>
+          <tr><th>n</th><th>n²</th><th>√n</th><th>eⁿ</th><th>β</th></tr>
+        </thead>
+        <tbody id="func-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="i18n.js"></script>
+<script src="calc.js"></script>
+<script src="viz.js"></script>
+<script src="dim1.js"></script>
+<script src="dim2.js"></script>
+<script>
+(function() {
+  // Function Table
+  const tbody = document.getElementById('func-tbody');
+  const p = Calc.ALGO_PARAMS['pow'];
+  for (let n = 1; n <= 8; n++) {
+    const row = Calc.tableRow(n);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="num">${row.n}</td>
+      <td class="num">${row.sq}</td>
+      <td class="num">${row.sqrt}</td>
+      <td class="num">${row.exp}</td>
+      <td class="num">${(p.beta * n).toFixed(3)}</td>`;
+    tbody.appendChild(tr);
+  }
+
+  // Dim切り替え（I・IIのみ）
+  const DIM_NAMES = { '1': 'Orbital View', '2': 'Trade-off' };
+  let currentDim = '1';
+  document.querySelectorAll('.dim-btn:not(.locked)').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (currentDim === btn.dataset.dim) return;
+      document.querySelectorAll('.dim-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('active'));
+      currentDim = btn.dataset.dim;
+      btn.classList.add('active');
+      const panel = document.getElementById(`panel-${currentDim}`);
+      if (panel) panel.classList.add('active');
+      document.getElementById('status-dim').textContent =
+        `Dimension ${['I','II'][+currentDim-1]} — ${DIM_NAMES[currentDim]}`;
+      if (currentDim === '1') { Dim1.start(); Dim2.stop(); }
+      if (currentDim === '2') { Dim2.start(); Dim1.stop(); }
+    });
+  });
+
+  // i18n
+  if (window.I18n) I18n.init();
+
+  // 起動
+  Dim1.setAlgo('pow');
+  Dim1.start();
+  Dim2.setAlgo('pow');
+})();
+</script>
+</body>
+</html>
