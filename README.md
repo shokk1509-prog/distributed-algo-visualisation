@@ -27,3 +27,6 @@ Further documentation is available upon request.
 ---
 
 The inclusion of the United Kingdom reflects a gesture of gratitude to Stephen Hawking, whose intellectual work shaped the structural origin of this project.
+# My Project
+![video-output-DCCFE837-39A2-4DCF-8E8D-02B915C23B13-1-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/d54ef635-9e1d-4a2f-8540-990d96b31b73)
+Here’s a preview of the functionality:
