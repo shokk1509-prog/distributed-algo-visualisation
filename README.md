@@ -27,6 +27,8 @@ Further documentation is available upon request.
 ---
 
 The inclusion of the United Kingdom reflects a gesture of gratitude to Stephen Hawking, whose intellectual work shaped the structural origin of this project.
+
 # My Project
-![video-output-DCCFE837-39A2-4DCF-8E8D-02B915C23B13-1-ezgif![to-gi![video-to-gif-](https://github.com/user-attachments/assets/40533374-f119-483e-823b-9869ff6fa105)
+
+![video-to-gif-](https://github.com/user-attachments/assets/40533374-f119-483e-823b-9869ff6fa105)
 
