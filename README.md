@@ -29,9 +29,9 @@ Further documentation is available upon request.
 The inclusion of the United Kingdom reflects a gesture of gratitude to Stephen Hawking, whose intellectual work shaped the structural origin of this project.
 # My Project
 ![video-output-DCCFE837-39A2-4DCF-8E8D-02B915C23B13-1-ezgif![to-gi![video-to-gif-](https://github.com/user-attachments/assets/40533374-f119-483e-823b-9869ff6fa105)
+The inclusion of the United Kingdom reflects a gesture of gratitude to Stephen Hawking, whose intellectual work shaped the structural origin of this project.
+# My Project
 ![video-to-gif-](https://github.com/user-attachments/assets/40533374-f119-483e-823b-9869ff6fa105)
-f-converter](https://github.com/user-attachments/assets/e1aee640-67e9-4f33-94b7-d4291967ff0e)
-![to-gif-converter](https://github.com/user-attachments/assets/e1aee640-67e9-4f33-94b7-d4291967ff0e)
- com-video-to-gif-converter](https://github.com/user-attachments/assets/d54ef635-9e1d-4a2f-8540-990d96b31b73)
+
 
 Here’s a preview of the functionality:
