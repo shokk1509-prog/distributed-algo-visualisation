@@ -20,12 +20,6 @@ Those genuinely interested are welcome to reach out.
 
 ---
 
-Under Japanese administrative records, I have a recognized cognitive disability. 
-This work focuses on analyzing systemic structures rather than evaluating individuals. 
-Further documentation is available upon request.
-
----
-
 The inclusion of the United Kingdom reflects a gesture of gratitude to Stephen Hawking, whose intellectual work shaped the structural origin of this project.
 
 # My Project
