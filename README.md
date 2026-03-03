@@ -20,11 +20,9 @@ Those genuinely interested are welcome to reach out.
 
 ---
 
-I am classified as intellectually disabled under Japanese administrative records.
-
-This project exists as a structural critique — not of individuals, but of systems that conflate compliance with capability.
-
-Documentation is available upon request.
+Under Japanese administrative records, I have a recognized cognitive disability. 
+This work focuses on analyzing systemic structures rather than evaluating individuals. 
+Further documentation is available upon request.
 
 ---
 
